@@ -169,6 +169,7 @@ class ClientServicesView extends Component
          ->when($this->event_type && $this->event_type != '', function($query) {
             return $query->where('service_description', 'like', '%'.$this->event_type.'%')->orWhere('service_title', 'like', '%'.$this->event_type.'%');
          })
+         
          ->with('favorites', 'reviews')
          ->orderBy('service_rating', 'DESC')
          ->paginate($this->perPage),

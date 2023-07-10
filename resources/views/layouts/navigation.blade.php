@@ -295,7 +295,7 @@
                         <p class="choose-more">Continue with <a title="Google" class="gg" href="{{ route('google.login') }}">Google</a></p>
                         <p class="choose-or"><span>Or</span></p>
                         <div class="popup-content">
-                           <form  class="form-sign form-content" id="signup" method="POST" action="{{ route('register') }}">
+                        <form class="form-sign form-content" id="signup" method="POST" action="{{ route('register') }}" onsubmit="return validateRecaptcha(event)">
                               @csrf
                               <div class="field-inline">
                                  <div class="field-input">
@@ -329,11 +329,24 @@
                                     <strong style="color: red"></strong>
                                  </span>
                               </div>
+                              <p style="color: #000; float: right; cursor: pointer;" id="show-password" onclick="passwordShow(this.id)">Show</p>
+                              <p style="color: #000; float: right; cursor: pointer;" hidden id="hide-password" onclick="passwordShow(this.id)">Hide</p>
+
                               <div class="field-input">
                                  <input type="password" placeholder="Password confirmation" value="" name="password_confirmation" id="passwordconfirmbox-id" autocomplete="off" required>
                               </div>
-                              <p style="color: #000; float: right; cursor: pointer; margin-bottom: 5px" id="show-password" onclick="passwordShow(this.id)">Show Password</p>
-                              <p style="color: #000; float: right; cursor: pointer; margin-bottom: 5px" hidden id="hide-password" onclick="passwordShow(this.id)">Hide Password</p>
+
+                              <div class="form-group row {{ $errors->has('g-recaptcha-response') ? ' has-error' : '' }}" style="padding-bottom:20px">
+                                 <label for="captcha" class="col-form-label text-md-right">{{ __('Captcha') }}</label>
+                                 <div class="col-md-6">
+                                 <div class="g-recaptcha" data-sitekey="{{ env('GOOGLE_RECAPTCHA_KEY') }}"></div>
+                                 <!-- @if ($errors->has('g-recaptcha-response'))
+                                 <span class="help-block">
+                                    <strong>{{ $errors->first('g-recaptcha-response') }}</strong>
+                                 </span>
+                                 @endif -->
+                                 </div>
+                              </div>
 
                               <input type="submit" name="submit" value="Register" id="register-button">
                            </form>
@@ -374,92 +387,8 @@
       </div><!-- .container-fluid -->
    </div>
 @push('scripts')
-   <script>
-      let recaptcha_site_key = {!! json_encode(config('services.recaptcha.site_key')) !!}
-      $(function () {
-         $('#login').on('submit', function(e) {
-            $('#login-button').attr('disabled', 'disabled')
-            e.preventDefault()
-            let formData = $(this).serializeArray()
-            grecaptcha.ready(function() {
-               grecaptcha.execute(recaptcha_site_key, {action: 'submit'})
-               .then(function(token) {
-                  $.ajax({
-                     method: "POST",
-                     dataType: 'json',
-                     headers: {
-                        Accept: 'application/json'
-                     },
-                     url: "{{ route('login') }}",
-                     data: formData,
-                     success: ({ redirectPath }) => window.location.assign(redirectPath),
-                     error: (response) => {
-                        if (response.status === 422) {
-                           $('#error-message').css({'display': 'block'})
-                           $('#login-button').removeAttr('disabled')
-                           setTimeout(() => {
-                              $('#error-message').css({'display': 'none'})
-                           }, 5000);
-                        } else {
-                           $('#login-button').removeAttr('disabled')
-                           toastr.options =
-                                 {
-                                    "closeButton" : true,
-                                    "progressBar" : true,
-                                    "positionClass" : "toast-bottom-right"
-                                 }
-                           toastr.error("An error occured. Please try again");
-                        }
-                     }
-                  })
-               })
-            })
-         })
-
-         $('#signup').on('submit', function (e) {
-            e.preventDefault();
-            let formData = $(this).serializeArray();
-            grecaptcha.ready(function() {
-               grecaptcha.execute(recaptcha_site_key, {action: 'submit'})
-               .then(function(token) {
-                  $("#register-button").val('Please Wait...')
-                  $("#register-button").attr('disabled', 'disabled')
-                  $.ajax({
-                     method: "POST",
-                     dataType: "json",
-                     headers: {
-                        Accept: "application/json"
-                     },
-                     url: "{{ route('register') }}",
-                     data: formData,
-                     success: ({ redirectPath }) => window.location.assign(redirectPath),
-                     error: (response) => {
-                        if(response.status === 422) {
-                              let errors = response.responseJSON.errors;
-                              Object.keys(errors).forEach(function (key) {
-                              $("#" + key + "Error").children("strong").text(errors[key][0]);
-                              });
-                              $("#register-button").val('Register')
-                           $("#register-button").removeAttr('disabled')
-                        } else {
-                           $("#register-button").val('Register')
-                           $("#register-button").removeAttr('disabled')
-                           toastr.options =
-                                 {
-                                    "closeButton" : true,
-                                    "progressBar" : true,
-                                    "positionClass" : "toast-bottom-right"
-                                 }
-                           toastr.error("An error occured. Please try again");
-                        }
-                     }
-                  })
-               })
-            })
-         });
-      })
-
-      function passwordShow(id) {
+<script>
+        function passwordShow(id) {
          var x = document.getElementById("passwordbox-id");
          var x_confirm = document.getElementById("passwordconfirmbox-id");
          if (x.type === "password") {
@@ -481,6 +410,66 @@
          }
       }
    </script>
+   <script>
+   function validateForm(event) {
+      // Prevent the form from submitting automatically
+      event.preventDefault();
+
+      // Check if the reCAPTCHA response is filled
+      var response = grecaptcha.getResponse();
+      if (response.length === 0) {
+         // reCAPTCHA is not filled, display an error message
+         alert("Please complete the reCAPTCHA.");
+         return;
+      }
+
+      // If the reCAPTCHA is filled, submit the form
+      document.getElementById("signup").submit();
+   }
+</script>
+
+
+
+   <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+   <script>
+      function validateRecaptcha(event) {
+      var response = grecaptcha.getResponse();
+      if (response.length === 0) {
+         // reCAPTCHA is not filled, prevent form submission
+         event.preventDefault();
+         alert("Please complete the reCAPTCHA.");
+      } else {
+         // reCAPTCHA is filled, allow form submission
+         return true;
+      }
+   }
+
+
+    function recaptchaCallback(token) {
+         document.getElementById('recaptchaResponse').value = token;
+         document.getElementById('recaptchaError').textContent = '';
+      }
+
+      function recaptchaExpired() {
+         document.getElementById('recaptchaResponse').value = '';
+         document.getElementById('recaptchaError').textContent = 'reCAPTCHA verification expired. Please try again.';
+      }
+
+      document.getElementById('register-button').addEventListener('click', function(event) {
+         if (document.getElementById('recaptchaResponse').value === '') {
+            event.preventDefault();
+            toastr.options = {
+               "closeButton": true,
+               "progressBar": true,
+               "positionClass": "toast-bottom-right"
+            };
+            toastr.error('Please complete the reCAPTCHA verification.');
+         }
+      });
+
+   </script>
+
+
 @endpush
 </header><!-- .site-header -->
 

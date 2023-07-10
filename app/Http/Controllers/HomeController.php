@@ -33,7 +33,7 @@ class HomeController extends Controller
 {
    public function index()
    {
-      $services = Service::orderBy('service_rating', 'DESC')->where('service_status_id', 1)->inRandomOrder()->get()->take(8);
+      $services = Service::orderBy('service_rating', 'DESC')->where('service_status_id', 1)->where('featured', 1)->where('status', 1)->inRandomOrder()->get()->take(8);
       $categories = Category::all();
       $services->load('service_images', 'service_pricing');
       $vendors = Vendor::all();
