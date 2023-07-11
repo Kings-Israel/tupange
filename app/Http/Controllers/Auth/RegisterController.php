@@ -58,7 +58,7 @@ class RegisterController extends Controller
      * @param  array  $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    
+
     protected function validator(array $data)
     {
         return Validator::make($data, [
@@ -94,6 +94,7 @@ class RegisterController extends Controller
             'phone_number' => $data['phone_number'],
             'password' => Hash::make($data['password']),
             'phone_verification_code' => mt_rand(1000, 9999),
+            'g-recaptcha-response' => 'required|captcha',
         ]);
     }
 
