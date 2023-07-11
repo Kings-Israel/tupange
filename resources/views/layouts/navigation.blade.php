@@ -348,18 +348,19 @@
                                  </div>
                               </div> -->
 
-                              <div class="form-group row {{ $errors->has('g-recaptcha-response') ? ' has-error' : '' }} ">
-                            <label for="captcha" class="col-form-label text-md-right">{{ __('captcha') }}</label>
+                              <div class="form-group row {{ $errors->has('g-recaptcha-response') ? ' has-error' : '' }} " style="padding-bottom:20px">
+                                    <label for="captcha" class="col-form-label text-md-right">{{ __('captcha') }}</label>
 
-                            <div class="col-md-3" style="">
-                                {!! app('captcha')->display() !!}
-                                @if ($errors->has('g-recaptcha-response'))
-                                    <span class="help-block">
-                                        <strong>{{ $errors->first('g-recaptcha-response') }}</strong>
-                                    </span>
-                                @endif
-                            </div>
-     </div>
+                                    <div class="col-md-3" style="">
+                                       {!! app('captcha')->display() !!}
+                                       @if ($errors->has('g-recaptcha-response'))
+                                             <span class="help-block">
+                                                <strong>{{ $errors->first('g-recaptcha-response') }}</strong>
+                                             </span>
+                                       @endif
+                                    </div>
+                              </div>
+                            
 
                               <input type="submit" name="submit" value="Register" id="register-button">
                            </form>
