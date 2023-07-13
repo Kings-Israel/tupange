@@ -11,13 +11,23 @@
                   <div class="wrap">
                      <div class="meta">
                         <p class="name text-white">{!! $order->order_id !!}</p>
-                        <p class="preview text-white">{!! $order->order ? $order->order->service->service_title : '' !!}</p>
+                        @if ($order && $order->order && $order->order->service)
+                           <p class="preview text-white">{!! $order->order->service->service_title !!}</p>
+                        @else
+                           <p class="preview text-white"></p>
+                        @endif
+
                         @if ($order->hasUnreadMessages())
                            <i class="fas fa-circle" style="color: #8FCA27; font-size: 8px; float: right; margin-top: -30px"></i>
                         @endif
                      </div>
                      <div class="chat-service-mobile-view">
-                        <img src="https://ui-avatars.com/api/?name={!! $order->order ? $order->order->service->service_title : 'Service' !!}&rounded=true&size=60" alt="" />
+                     @php
+                        $serviceName = $order->order && $order->order->service ? $order->order->service->service_title : 'Service';
+                     @endphp
+
+                     <img src="https://ui-avatars.com/api/?name={{ urlencode($serviceName) }}&rounded=true&size=60" alt="" />
+
                      </div>
                   </div>
                </li>

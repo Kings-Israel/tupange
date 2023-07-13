@@ -41,18 +41,20 @@ class ServiceController extends Controller
       return view('client.services')->with($request->all());
    }
 
-   public function vendorService(Service $service)
-   {
-      $service->load('service_pricing', 'service_images');
-      return view('vendor.service')->with(['service' => $service]);
-   }
-
    public function clientService(Service $service)
    {
       $service->load('vendor');
       $services = Service::where('vendor_id', $service->vendor->id)->where('id', '!=', $service->id)->where('service_status_id', 1)->take(6)->get();
       return view('client.service')->with(['service' => $service, 'services' => $services]);
    }
+
+   public function vendorService(Service $service)
+   {
+      $service->load('service_pricing', 'service_images');
+      return view('vendor.service')->with(['service' => $service]);
+   }
+
+
 
    public function addService()
    {

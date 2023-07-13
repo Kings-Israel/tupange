@@ -62,18 +62,20 @@
                   <div class="place-item layout-02 place-hover">
                      <div class="place-inner">
                         <div class="place-thumb hover-img">
-                           <a class="entry-thumb" href="{{ route('client.service.one', $service) }}"><img class="service-cover-image" src="{{ $service->getCoverImage($service->service_image) }}" alt="{{ $service->service_title }}" onerror="this.onerror=null; this.src='{{ $service->vendor->getCompanyLogo($service->vendor->company_logo) }}'"></a>
+                           <a class="entry-thumb" href="{{ route('client.service.one', $service) }}">
+                              <img class="service-cover-image" src="{{ $service->getCoverImage($service->service_image) }}" alt="{{ $service->service_title }}" onerror="this.onerror=null; this.src='{{ optional($service->vendor)->company_logo ?? '' }}'">
+                           </a>
                            <div class="service_gallery_images_preview">
                               @if (count($service->service_images))
                                  <div class="service_images_preview">
                                     @foreach ($service->service_images->shuffle()->take(3) as $image)
-                                       <img class="service_image_preview" src="{{ $service->getImage($image->image) }}" alt="{{ $service->service_title }}" onerror="this.onerror=null; this.src='{{ $service->vendor->getCompanyLogo($service->vendor->company_logo) }}'">
+                                       <img class="service_image_preview" src="{{ $service->getImage($image->image) }}" alt="{{ $service->service_title }}" onerror="this.onerror=null; this.src='{{ optional($service->vendor)->company_logo ?? '' }}'">
                                     @endforeach
                                  </div>
                               @endif
                            </div>
                            @auth
-                              @if (auth()->user()->id != $service->vendor->user_id)
+                              @if (auth()->user()->id != optional($service->vendor)->user_id)
                                  <livewire:service-favorite :service="$service" :watched-file="$service->id" :key="now().$service->id" />
                               @endif
                            @endauth
@@ -81,10 +83,10 @@
                         <div class="entry-detail">
                            <div class="entry-head">
                               <div class="place-type list-item">
-                                 <span>{{ $service->getCategory($service->category_id)->name }}</span>
+                                 <span>{{ optional($service->getCategory($service->category_id))->name }}</span>
                               </div>
                               <div class="place-city">
-                                 <span>{{ $service->vendor->company_name }}</span>
+                                 <span>{{ optional($service->vendor)->company_name }}</span>
                               </div>
                            </div>
                            <h3 class="place-title"><a href="{{ route('client.service.one', $service) }}">{{ $service->service_title }}</a></h3>
@@ -102,7 +104,7 @@
                               </div>
 
                               @auth
-                                 @if (auth()->user()->id != $service->vendor->user_id)
+                                 @if (auth()->user()->id != optional($service->vendor)->user_id)
                                     {{-- <livewire:service-cart :service="$service" :watched-file="$service->id" :key="$service->id" /> --}}
                                     <div class="place-price" style="cursor: pointer">
                                        <a title="View Pricing Packages for the service" href="{{ route('client.service.one', $service) }}" style="font-size: 17px;">View Packages</a>

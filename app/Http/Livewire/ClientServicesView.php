@@ -144,8 +144,9 @@ class ClientServicesView extends Component
    public function render()
    {
       return view('livewire.client-services-view', [
-         "services" => Service::
-         where('service_status_id', 1)
+         "services" => Service::                                      
+         where('status', 1) // Filter by status = 1
+      ->where('service_status_id', 1) // Filter by service_status_id = 1
          ->when($this->date && $this->date != '', function($query) {
             $this->date = Carbon::parse($this->date)->format('Y-m-d');
                return $query->where('pause_from', null)->orWhere('pause_from', '>', $this->date);
