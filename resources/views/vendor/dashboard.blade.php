@@ -60,7 +60,7 @@
                                             <li class="pending">
                                                 <p class="date"><b>Ordered:</b>{{ $order->created_at->diffForHumans() }}</p>
                                                 <p class="place"><b>Service:</b>{{ $order->service->service_title }}</p>
-                                                <p class=""><b>Client:</b>{{ $order->user->f_name }} {{ $order->user->l_name }}</p>
+                                                <p class=""><b>Client:</b>{{ $order->user->f_name ?? ''}} {{ $order->user->l_name ?? ''}}</p>
                                                 <a href="{{ route('vendor.orders.one', $order) }}" title="More" class="more"><i class="las la-angle-right"></i></a>
                                             </li>
                                         @endforeach

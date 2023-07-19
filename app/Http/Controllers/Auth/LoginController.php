@@ -110,13 +110,13 @@ class LoginController extends Controller
 
     protected function redirectTo()
     {
-        if (Auth::user()->status == 'vendor') {
+        if (Auth::check() && Auth::user()->status == 'vendor') {
             return '/vendor/dashboard';
         }
-
+    
         return '/';
     }
-
+    
     /**
      * Create a new controller instance.
      *
